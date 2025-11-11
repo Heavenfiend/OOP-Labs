@@ -21,7 +21,7 @@ struct Person {
 
 int main() {
     FixedBlockMemoryResource memory_resource(50);
-
+    // проверяем на легко структуре на
     std::cout << "=== int ===" << std::endl;
 
     DoublyLinkedList<int> int_list(&memory_resource);
@@ -44,9 +44,8 @@ int main() {
         std::cout << value << " ";
     }
     std::cout << std::endl;
-
+    // проверяем на сложной структуре на
     std::cout << "\n=== Person ===" << std::endl;
-
     DoublyLinkedList<Person> person_list(&memory_resource);
 
     person_list.push_back(Person("Alice", 25));
