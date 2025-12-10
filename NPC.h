@@ -1,3 +1,6 @@
+//
+// Created by Egor on 10 11 2025
+//
 #ifndef NPC_H
 #define NPC_H
 
@@ -25,10 +28,6 @@ public:
     virtual char getTypeChar() const = 0;
 
     void move_towards(double target_x, double target_y);
-
-    // Методы для сохранения/загрузки
-    std::string to_string() const;
-    static std::unique_ptr<NPC> from_string(const std::string& line);
 };
 
 class Bear : public NPC {

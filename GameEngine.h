@@ -1,3 +1,6 @@
+//
+// Created by Egor on 10 11 2025
+//
 #ifndef GAMEENGINE_H
 #define GAMEENGINE_H
 
