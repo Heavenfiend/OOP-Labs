@@ -28,14 +28,14 @@ void NPC::move_towards(double target_x, double target_y) {
     y = std::max(0.0, std::min(500.0, y));
 }
 
-// Реализация to_string
+// to_string
 std::string NPC::to_string() const {
     std::ostringstream oss;
     oss << getTypeChar() << " " << name << " " << x << " " << y;
     return oss.str();
 }
 
-// Реализация from_string
+// from_string
 std::unique_ptr<NPC> NPC::from_string(const std::string& line) {
     std::istringstream iss(line);
     std::string type_str, name;

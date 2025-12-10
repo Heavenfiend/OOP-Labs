@@ -23,7 +23,7 @@ void GameEngine::run() {
     std::thread game_thread([this, &gen, &dis, &scheduler_thread]() {
         auto start_time = std::chrono::steady_clock::now();
         std::uniform_real_distribution<> move_dis(-1.0, 1.0);
-
+        // 30 секунд
         while (true) {
             auto now = std::chrono::steady_clock::now();
             if (now - start_time >= std::chrono::seconds(GAME_DURATION)) {
@@ -33,10 +33,12 @@ void GameEngine::run() {
             }
 
             {
+                // захватываем мьютекс для доступа к миру
                 std::unique_lock<std::shared_mutex> lock(world_mtx);
                 auto& npcs = editor.get_npcs();
-
+                // перемещаем всех NPC
                 for (auto& npc : npcs) {
+                    // пропускаем мёртвых
                     if (!npc->alive) continue;
 
                     {
@@ -46,10 +48,10 @@ void GameEngine::run() {
 
                     for (auto& other : npcs) {
                         if (npc.get() == other.get() || !other->alive) continue;
-
+                        // проверяем, что расстояние меньше kill_distance
                         if (npc->distance_to(*other) <= npc->kill_distance) {
                             if (npc->can_kill(*other)) {
-                                // Создаём корутину и отправляем в планировщик
+                                // создаём корутину и отправляем в планировщик
                                 auto task = fight_coro(*npc, *other, cout_mtx);
                                 scheduler.submit(task.handle);
                             }
@@ -57,23 +59,23 @@ void GameEngine::run() {
                     }
                 }
             }
-
+            // спим 100 мс чтобы не перегружать процессор
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     });
-
+    // выводим карту каждую секунду только с живыми NPC
     std::thread display_thread([this]() {
         for (int i = 0; i < GAME_DURATION; ++i) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
             print_map();
         }
     });
-
+    // ждём завершения потоков
     game_thread.join();
     display_thread.join();
     scheduler_thread.join();
 }
-
+// вспомогательная функция для вывода карты
 void GameEngine::print_map() {
     std::ostringstream oss;
     oss << "\n=== MAP ===\n";
@@ -86,7 +88,7 @@ void GameEngine::print_map() {
     std::lock_guard<std::mutex> cout_lock(cout_mtx);
     std::cout << oss.str();
 }
-
+// выводим выживших после игры
 void GameEngine::print_survivors() {
     std::lock_guard<std::mutex> cout_lock(cout_mtx);
     std::cout << "\n=== SURVIVORS ===\n";
